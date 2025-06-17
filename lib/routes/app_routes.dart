@@ -1,14 +1,21 @@
-
 abstract class Routes {
   Routes._();
-  static const login = Paths.LOGIN;
-  static const home = Paths.HOME;
-  static const signUp = Paths.SIGNUP;
-  static const appointment = Paths.APPOINTMENT;
-  static const dashboard = Paths.DASHBOARD;
-  static const overview = Paths.DASHBOARD;
-  static const healthCard = Paths.HEALTHCARD;
-  static const myLoans = Paths.MYLOANS;
+  static const LOGIN = '/login';
+  static const DASHBOARD = '/dashboard';
+  static const HOME = '/home';
+  static const APPOINTMENT = '/appointment';
+  static const OVERVIEW = '/overview';
+  static const HEALTHCARDTAB = '/health-card-tab';
+  static const MYLOANS = '/my-loans';
+  static const HOSPITALVISITS = '/hospital-visits';
+  static const UPCOMINGAPPOINTMENT = '/upcoming-appointment';
+  static const HEALTHCARE = '/healthcare';
+  static const HEALTHCARDOVERVIEW = '/health-card-overview';
+  static const TRANSACTIONS = '/transactions';
+  static const PAYMENT = '/payment';
+  static const PROFILE = '/profile';
+  static const KYCPAGE = '/kyc-page';
+  static const REGISTER = '/register';
 }
 
 abstract class Paths {
@@ -19,6 +26,14 @@ abstract class Paths {
   static const APPOINTMENT = '/appointment';
   static const DASHBOARD = '/dashboard';
   static const OVERVIEW = '/overview';
-  static const HEALTHCARD = '/healthCard';
-  static const MYLOANS= '/myLoans';
+  static const MYLOANS = '/my-loans';
+  static const HOSPITALVISITS = '/hospital-visits';
+  static const UPCOMINGAPPOINTMENT = '/upcoming-appointment';
+  static const HEALTHCARE = '/healthcare';
+  static const HEALTHCARDTAB = '/health-card-tab';
+  static const HEALTHCARDOVERVIEW = '/health-card-overview';
+  static const TRANSACTIONS = '/transactions';
+  static const PAYMENT = '/payment';
+  static const PROFILE = '/profile';
+  static const KYCPAGE = '/kyc-page';
 }

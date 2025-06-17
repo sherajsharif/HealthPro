@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ri_medicare/home/home_controller.dart';
+import 'package:ri_medicare/chatbot_widget.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -17,6 +18,13 @@ class HomeView extends GetView<HomeController> {
             _buildNearbySection(context),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.to(() => const ChatbotWidget());
+        },
+        backgroundColor: Get.theme.primaryColor,
+        child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
       ),
     );
   }
@@ -203,6 +211,4 @@ class HomeView extends GetView<HomeController> {
       ),
     );
   }
-
-
 }

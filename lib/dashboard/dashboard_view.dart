@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 import 'package:ri_medicare/dashboard/dashboard_controller.dart';
-import 'package:ri_medicare/health_card/health_card_view.dart';
-import 'package:ri_medicare/my_loans/my_loans_view.dart';
+import 'package:ri_medicare/health_card/health_card_tab/health_card_tab_view.dart';
+import 'package:ri_medicare/health_care/health_care_tab/healthcare_tab_view.dart';
+import 'package:ri_medicare/kyc_page/kyc_page_view.dart';
 import 'package:ri_medicare/overview/overview_view.dart';
+import 'package:ri_medicare/profile/profile_view.dart';
 
 class DashboardView extends GetView<DashboardController>{
   @override
@@ -15,8 +17,9 @@ class DashboardView extends GetView<DashboardController>{
           index: controller.currentIndex.value,
           children: [
             OverViewPage(),
-            HealthCardView(),
-            MyLoansView(),
+            HealthCardTabView(),
+            HealthCareTabView(),
+            KYCPageView(),
           ],
         ),)
       ),
@@ -37,7 +40,11 @@ class DashboardView extends GetView<DashboardController>{
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
-            label: 'Appointments',
+            label: 'Health Card',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.description_outlined),
+            label: 'Healthcare',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

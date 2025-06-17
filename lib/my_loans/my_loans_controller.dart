@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:ri_medicare/models/emi_payment.dart';
+import 'package:ri_medicare/models/emi_payments.dart';
 
 class MyLoansController extends GetxController{
   final cardNumber = 'HC-78901-23456'.obs;
@@ -8,8 +8,16 @@ class MyLoansController extends GetxController{
   final availableBalance = 25000.0.obs;
   final usedCredit = 15000.0.obs;
   final totalCreditLimit = 40000.0.obs;
+  final paymentHistory = <EMIPayment>[].obs;
 
   double get creditUtilization => (usedCredit.value / totalCreditLimit.value) * 100;
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadPaymentHistory();
+  }
+
 
   // Loan Details
   final loanId = 'LOAN-123456'.obs;
@@ -21,43 +29,35 @@ class MyLoansController extends GetxController{
   final nextPaymentDue = '15/12/2023'.obs;
   final loanProgress = 50.0.obs;
 
-  // EMI Payment History
-  final paymentHistory = <EMIPayment>[
-    EMIPayment(
-      emiNumber: 11,
-      dueDate: '15/11/2023',
-      totalAmount: 2500,
-      principal: 1800,
-      interest: 700,
-      isPaid: true,
-      paymentDate: '14/11/2023',
-    ),
-    EMIPayment(
-      emiNumber: 10,
-      dueDate: '15/10/2023',
-      totalAmount: 2500,
-      principal: 1780,
-      interest: 720,
-      isPaid: true,
-      paymentDate: '15/10/2023',
-    ),
-    EMIPayment(
-      emiNumber: 9,
-      dueDate: '15/09/2023',
-      totalAmount: 2500,
-      principal: 1760,
-      interest: 740,
-      isPaid: true,
-      paymentDate: '13/09/2023',
-    ),
-    EMIPayment(
-      emiNumber: 8,
-      dueDate: '15/08/2023',
-      totalAmount: 2500,
-      principal: 1740,
-      interest: 760,
-      isPaid: true,
-      paymentDate: '15/08/2023',
-    ),
-  ].obs;
+  void loadPaymentHistory() {
+    paymentHistory.value = [
+      EMIPayment(
+        emiNumber: 1,
+        dueDate: '01/03/2024',
+        totalAmount: 5000,
+        principal: 4200,
+        interest: 800,
+        status: 'Paid',
+        paymentDate: '01/03/2024',
+      ),
+      EMIPayment(
+        emiNumber: 2,
+        dueDate: '01/04/2024',
+        totalAmount: 5000,
+        principal: 4300,
+        interest: 700,
+        status: 'Pending',
+        paymentDate: '-',
+      ),
+      EMIPayment(
+        emiNumber: 3,
+        dueDate: '01/05/2024',
+        totalAmount: 5000,
+        principal: 4400,
+        interest: 600,
+        status: 'Upcoming',
+        paymentDate: '-',
+      ),
+    ];
+  }
 }

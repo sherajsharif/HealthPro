@@ -4,7 +4,7 @@ class EMIPayment {
   final double totalAmount;
   final double principal;
   final double interest;
-  final bool isPaid;
+  final String status;
   final String paymentDate;
 
   EMIPayment({
@@ -13,7 +13,7 @@ class EMIPayment {
     required this.totalAmount,
     required this.principal,
     required this.interest,
-    required this.isPaid,
+    required this.status,
     required this.paymentDate,
   });
 }

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AuthController extends GetxController{
   final isLoading = false.obs;
-  final isLoggedIn = false.obs;
+  final _isLoggedIn = false.obs;
   final obscurePassword = true.obs;
+  final String baseUrl = 'http://192.168.125.65:5000';  // Local server address
 
   // Form controllers
   final emailController = TextEditingController();
@@ -13,14 +16,20 @@ class AuthController extends GetxController{
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
 
+  bool get isLoggedIn => _isLoggedIn.value;
+
   @override
   void onInit() {
     super.onInit();
+    print('AuthController initialized');
+    print('Using baseUrl: $baseUrl');
     checkLoginStatus();
+    testBackendConnection();
   }
 
   @override
   void onClose() {
+    print('AuthController disposed');
     emailController.dispose();
     passwordController.dispose();
     nameController.dispose();
@@ -29,45 +38,152 @@ class AuthController extends GetxController{
   }
 
   Future<void> checkLoginStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    isLoggedIn.value = prefs.getBool('isLoggedIn') ?? false;
+    try {
+      print('Checking login status...');
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      _isLoggedIn.value = token != null;
+      print('Login status: ${_isLoggedIn.value}');
+    } catch (e) {
+      print('Error checking login status: $e');
+      _isLoggedIn.value = false;
+    }
+  }
+
+  Future<void> testBackendConnection() async {
+    try {
+      print('Testing backend connection to: $baseUrl');
+      final testUrl = '$baseUrl/api/auth';
+      print('Testing endpoint: $testUrl');
+      
+      final response = await http.get(
+        Uri.parse(testUrl),
+        headers: {
+          'Accept': 'application/json',
+        },
+      );
+      print('Backend connection test response: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      
+      if (response.statusCode == 200) {
+        print('Server is running and accessible');
+        Get.snackbar(
+          'Server Connected',
+          'Successfully connected to the server',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: const Color(0xFF00C6AD),
+          colorText: Colors.white,
+          duration: const Duration(seconds: 3),
+        );
+      } else {
+        print('Server responded with status: ${response.statusCode}');
+        Get.snackbar(
+          'Server Response',
+          'Server responded with status: ${response.statusCode}',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 3),
+        );
+      }
+    } catch (e) {
+      print('Backend connection test failed: $e');
+      Get.snackbar(
+        'Connection Error',
+        'Cannot connect to the server at $baseUrl. Please check if the server is running on port 5000.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 5),
+      );
+    }
   }
 
   void togglePasswordVisibility() {
     obscurePassword.value = !obscurePassword.value;
   }
 
-  Future<void> login() async {
-    // if (!_validateLoginForm()) return;
-
+  Future<void> login(String email, String password) async {
+    print('Attempting login with email: $email');
+    print('Using baseUrl: $baseUrl');
     isLoading.value = true;
     try {
-      // await Future.delayed(const Duration(seconds: 2)); // Simulated API call
+      final url = '$baseUrl/api/auth';  // Corrected endpoint
+      print('Sending login request to: $url');
+      
+      final requestBody = {
+        'email': email,
+        'password': password,
+        'role': 'patient',
+      };
+      print('Request body: ${jsonEncode(requestBody)}');
 
-      // Store login status
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      await prefs.setString('userEmail', emailController.text);
-
-      isLoggedIn.value = true;
-      Get.offAllNamed('/dashboard'); // Navigate to home page
-
-      _clearForm();
-
-      Get.snackbar(
-        'Success',
-        'Welcome back!',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFF00C6AD),
-        colorText: Colors.white,
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode(requestBody),
       );
+
+      print('Login response status: ${response.statusCode}');
+      print('Login response headers: ${response.headers}');
+      print('Login response body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = json.decode(response.body);
+        print('Decoded response data: $responseData');
+
+        if (responseData['status'] == 'success' || responseData['token'] != null) {
+          final token = responseData['token'];
+          print('Login successful. Token received: $token');
+          
+          // Save token and login status
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+          await prefs.setBool('isLoggedIn', true);
+          
+          _isLoggedIn.value = true;
+          Get.offAllNamed('/dashboard');
+          
+          Get.snackbar(
+            'Success',
+            'Welcome back!',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: const Color(0xFF00C6AD),
+            colorText: Colors.white,
+          );
+        } else {
+          print('Login failed: ${responseData['message']}');
+          Get.snackbar(
+            'Error',
+            responseData['message'] ?? 'Login failed',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        }
+      } else {
+        print('Login failed with status: ${response.statusCode}');
+        print('Error response body: ${response.body}');
+        Get.snackbar(
+          'Error',
+          'Login failed with status: ${response.statusCode}',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
     } catch (e) {
+      print('Login error: $e');
       Get.snackbar(
-        'Error',
-        'Login failed. Please try again.',
+        'Connection Error',
+        'Cannot connect to the server. Please check your internet connection and try again.',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
+        duration: const Duration(seconds: 5),
       );
     } finally {
       isLoading.value = false;
@@ -88,7 +204,7 @@ class AuthController extends GetxController{
       await prefs.setString('userName', nameController.text);
       await prefs.setString('userPhone', phoneController.text);
 
-      isLoggedIn.value = true;
+      _isLoggedIn.value = true;
       Get.offAllNamed('/dashboard'); // Navigate to home page
 
       _clearForm();
@@ -114,16 +230,15 @@ class AuthController extends GetxController{
   }
 
   Future<void> logout() async {
+    print('Attempting logout...');
     isLoading.value = true;
     try {
-      await Future.delayed(const Duration(seconds: 1)); // Simulated API call
-
       // Clear stored data
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
 
-      isLoggedIn.value = false;
-      Get.offAllNamed('/login'); // Navigate to login page
+      _isLoggedIn.value = false;
+      Get.offAllNamed('/login');
 
       Get.snackbar(
         'Success',
@@ -132,7 +247,9 @@ class AuthController extends GetxController{
         backgroundColor: const Color(0xFF00C6AD),
         colorText: Colors.white,
       );
+      print('Logout successful');
     } catch (e) {
+      print('Logout error: $e');
       Get.snackbar(
         'Error',
         'Logout failed. Please try again.',

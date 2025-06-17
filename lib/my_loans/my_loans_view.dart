@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
-import 'package:percent_indicator/flutter_percent_indicator.dart';
-import 'package:ri_medicare/models/emi_payment.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:ri_medicare/models/emi_payments.dart';
 import 'package:ri_medicare/my_loans/my_loans_controller.dart';
 
-class MyLoansView extends GetView<MyLoansController>{
+class MyLoansView extends GetView<MyLoansController> {
+  const MyLoansView({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +45,7 @@ class MyLoansView extends GetView<MyLoansController>{
             Text(
               'Loan Details',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -52,12 +53,13 @@ class MyLoansView extends GetView<MyLoansController>{
               'Your active medical loan',
               style: TextStyle(
                 color: Colors.grey[600],
-                fontSize: 14,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
         ),
-        Icon(Icons.description_outlined, color: Colors.deepPurple),
+        Icon(Icons.description_outlined, color: Colors.deepPurple, size: 22),
       ],
     );
   }
@@ -91,6 +93,7 @@ class MyLoansView extends GetView<MyLoansController>{
 
   Widget _buildAmountCard(String title, String amount) {
     return Container(
+      height: 100,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -104,13 +107,14 @@ class MyLoansView extends GetView<MyLoansController>{
             style: TextStyle(
               color: Colors.grey[600],
               fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 8),
+          Spacer(),
           Text(
             amount,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -152,13 +156,14 @@ class MyLoansView extends GetView<MyLoansController>{
             style: TextStyle(
               color: Colors.grey[600],
               fontSize: 14,
+              fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             value,
             style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
               color: isHighlighted ? Colors.orange : Colors.black87,
             ),
           ),
@@ -183,7 +188,8 @@ class MyLoansView extends GetView<MyLoansController>{
           'You\'ve paid ${controller.loanProgress.value}% of your total loan amount',
           style: TextStyle(
             color: Colors.grey[600],
-            fontSize: 14,
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],
@@ -198,7 +204,7 @@ class MyLoansView extends GetView<MyLoansController>{
             onPressed: () {},
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.deepPurple,
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -219,12 +225,12 @@ class MyLoansView extends GetView<MyLoansController>{
   Widget _buildOutlinedButton(String label, IconData icon) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[300]!),
+        border: Border.all(color: Colors.grey[400]!),
         borderRadius: BorderRadius.circular(12),
       ),
       child: IconButton(
         onPressed: () {},
-        icon: Icon(icon),
+        icon: Icon(icon, size: 22,),
         color: Colors.grey[700],
       ),
     );
@@ -245,31 +251,28 @@ class MyLoansView extends GetView<MyLoansController>{
           'View your past EMI payments',
           style: TextStyle(
             color: Colors.grey[600],
-            fontSize: 14,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 16),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            children: [
-              _buildPaymentHistoryHeader(),
-              ...controller.paymentHistory.map(_buildPaymentHistoryItem).toList(),
-            ],
-          ),
-        ),
+        _buildPaymentCards(),
         const SizedBox(height: 16),
         Center(
-          child: TextButton(
-            onPressed: () {},
-            child: Text(
-              'View Complete History',
-              style: TextStyle(
-                color: Colors.deepPurple,
-                fontWeight: FontWeight.w500,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: Colors.deepPurple[50],
+              borderRadius: BorderRadius.circular(28),
+            ),
+            child: TextButton(
+              onPressed: () {},
+              child: Text(
+                'View Complete History',
+                style: TextStyle(
+                  color: Colors.deepPurple,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -278,60 +281,181 @@ class MyLoansView extends GetView<MyLoansController>{
     );
   }
 
-  Widget _buildPaymentHistoryHeader() {
-    return Container(
+  Widget _buildPaymentCards() {
+    return Obx(() => ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: controller.paymentHistory.length,
+      itemBuilder: (context, index) {
+        final payment = controller.paymentHistory[index];
+        return Container(
+          margin: EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              _buildPaymentCardHeader(payment),
+              Divider(height: 1),
+              _buildPaymentCardDetails(payment),
+            ],
+          ),
+        );
+      },
+    ));
+  }
+
+  Widget _buildPaymentCardHeader(EMIPayment payment) {
+    return Padding(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-      ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(flex: 1, child: Text('EMI #', style: TextStyle(fontWeight: FontWeight.w500))),
-          Expanded(flex: 2, child: Text('Due Date', style: TextStyle(fontWeight: FontWeight.w500))),
-          Expanded(flex: 2, child: Text('Amount', style: TextStyle(fontWeight: FontWeight.w500))),
-          Expanded(flex: 2, child: Text('Principal', style: TextStyle(fontWeight: FontWeight.w500))),
-          Expanded(flex: 2, child: Text('Interest', style: TextStyle(fontWeight: FontWeight.w500))),
-          Expanded(flex: 2, child: Text('Status', style: TextStyle(fontWeight: FontWeight.w500))),
-          Expanded(flex: 2, child: Text('Payment Date', style: TextStyle(fontWeight: FontWeight.w500))),
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.deepPurple.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'EMI #${payment.emiNumber}',
+                  style: TextStyle(
+                    color: Colors.deepPurple,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Due Date',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                        fontWeight : FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    payment.dueDate,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          _buildStatusBadge(payment.status),
         ],
       ),
     );
   }
 
-  Widget _buildPaymentHistoryItem(EMIPayment payment) {
+  Widget _buildStatusBadge(String status) {
+    Color backgroundColor;
+    Color textColor;
+
+    switch (status.toLowerCase()) {
+      case 'paid':
+        backgroundColor = Colors.green[50]!;
+        textColor = Colors.green;
+        break;
+      case 'pending':
+        backgroundColor = Colors.orange[50]!;
+        textColor = Colors.orange;
+        break;
+      default:
+        backgroundColor = Colors.blue[50]!;
+        textColor = Colors.blue;
+    }
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.grey[200]!)),
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(18),
       ),
-      child: Row(
+      child: Text(
+        status,
+        style: TextStyle(
+          color: textColor,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentCardDetails(EMIPayment payment) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
         children: [
-          Expanded(flex: 1, child: Text(payment.emiNumber.toString())),
-          Expanded(flex: 2, child: Text(payment.dueDate)),
-          Expanded(flex: 2, child: Text('₹${payment.totalAmount.toStringAsFixed(0)}')),
-          Expanded(flex: 2, child: Text('₹${payment.principal.toStringAsFixed(0)}')),
-          Expanded(flex: 2, child: Text('₹${payment.interest.toStringAsFixed(0)}')),
-          Expanded(
-            flex: 2,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.green[50],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                'Paid',
-                style: TextStyle(
-                  color: Colors.green,
-                  fontSize: 12,
-                ),
-              ),
-            ),
+          _buildPaymentDetailRow(
+            'Total Amount',
+            '₹${payment.totalAmount.toStringAsFixed(0)}',
+            Colors.deepPurple,
           ),
-          Expanded(flex: 2, child: Text(payment.paymentDate)),
+          SizedBox(height: 12),
+          _buildPaymentDetailRow(
+            'Principal',
+            '₹${payment.principal.toStringAsFixed(0)}',
+            Colors.black,
+          ),
+          SizedBox(height: 12),
+          _buildPaymentDetailRow(
+            'Interest',
+            '₹${payment.interest.toStringAsFixed(0)}',
+            Colors.black,
+          ),
+          if (payment.status.toLowerCase() == 'paid') ...[
+            SizedBox(height: 12),
+            _buildPaymentDetailRow(
+              'Payment Date',
+              payment.paymentDate,
+              Colors.black,
+            ),
+          ],
         ],
       ),
+    );
+  }
+
+  Widget _buildPaymentDetailRow(String label, String value, Color valueColor) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 12,
+            fontWeight: FontWeight.bold
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            color: valueColor,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ri_medicare/overview/overview_controller.dart';
-
+import 'package:ri_medicare/health_card/healthcard_overview/healthcard_overview_controller.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class OverViewPage extends GetView<OverViewController> {
   const OverViewPage({super.key});
@@ -9,262 +10,617 @@ class OverViewPage extends GetView<OverViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(),
-            const Divider(),
-            _buildOverviewCardGrid(),
-            _buildOtherCards(),
-          ],
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            children: [
+              _buildHeader(),
+              _buildHealthCardSection(context),
+              _buildOverviewCardGrid(context),
+              _buildQuickActions(context),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.only(right: 14.0, left: 14.0, top: 14.0),
+    return Container(
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Row(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Welcome, Patient User",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-              const Text(
-                "Health Card ID: HC-78901-23456",
-                style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                    color: Colors.grey),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Welcome, Patient User",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Health Card ID: HC-78901-23456",
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
           ),
-          const Spacer(),
           Stack(
             children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.notifications_none_rounded,
-                  size: 24,
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  shape: BoxShape.circle,
                 ),
-                onPressed: () {},
+                child: IconButton(
+                  icon: const Icon(Icons.notifications_outlined),
+                  onPressed: () {},
+                  color: Colors.grey[700],
+                ),
               ),
               Positioned(
-                right: 9,
-                top: 5,
+                right: 8,
+                top: 8,
                 child: Container(
                   padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: Colors.red,
                     shape: BoxShape.circle,
+                    // border: Border.all(color: Colors.white, width: 2),
                   ),
-                  constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                  constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
                   child: const Text(
                     "2",
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500),
+                      color: Colors.white,
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
-              )
+              ),
             ],
           ),
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.person_2_outlined,
-                size: 24,
-              ))
         ],
       ),
     );
   }
 
-  Widget _buildOverviewCardGrid() {
-    final cards = [
-      {'title': "Health Card", 'price': '\$25,000', 'icon': Icons.credit_card, 'overview': 'Available Credit', 'color': Colors.green, 'reminder': "Card: HC-78901-23456"},
-      {'title': "Active Loan", 'price': '\$35,000', 'icon': Icons.credit_card, 'overview': 'Remaining Balance', 'color': Colors.indigoAccent, 'reminder': "Next Payment: \u{20B9}2500 on 2023-12-15"},
-      {'title': "Health Activity", 'price': '4', 'icon': Icons.credit_card, 'overview': 'Recent Medical Visits', 'color': Colors.green, 'reminder': "Last Visit: Nov 20, 2023"},
-      {'title': "Appointments", 'price': '2', 'icon': Icons.credit_card, 'overview': 'Upcoming Appointments', 'color': Colors.indigoAccent, 'reminder': "Next: 2023-12-10"},
-    ];
+  Widget _buildHealthCardSection(BuildContext context) {
+    final healthCardController = Get.find<HeathCardOverviewController>();
+    final isTablet = MediaQuery.of(context).size.width > 600;
 
-    return GridView.builder(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(vertical: isTablet ? 24 : 16, horizontal: isTablet ? 24 : 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.deepPurple, Colors.deepPurple.shade300!],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.deepPurple.withOpacity(0.3),
+                blurRadius: 15,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'RI Medicare',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: isTablet ? 20 : 14,
+                    ),
+                  ),
+                  Text(
+                    'Gold Health Card',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: isTablet ? 16 : 12,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: isTablet ? 20 : 12),
+              Text(
+                'Card Number',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontWeight: FontWeight.bold,
+                  fontSize: isTablet ? 12 : 10,
+                ),
+              ),
+              Obx(() => Text(
+                    healthCardController.cardNumber.value,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: isTablet ? 20 : 14,
+                      letterSpacing: 1.5,
+                    ),
+                  )),
+              SizedBox(height: isTablet ? 20 : 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Expiry',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.bold,
+                          fontSize: isTablet ? 12 : 10,
+                        ),
+                      ),
+                      Obx(() => Text(
+                            healthCardController.expiryDate.value,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: isTablet ? 16 : 12,
+                            ),
+                          )),
+                    ],
+                  ),
+                  Obx(() => healthCardController.isActive.value
+                      ? Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isTablet ? 12 : 8,
+                            vertical: isTablet ? 6 : 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            'Active',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: isTablet ? 12 : 10,
+                            ),
+                          ),
+                        )
+                      : Container()),
+                ],
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: isTablet ? 20 : 16),
+        _buildBalanceSectionOverview(context, healthCardController),
+        SizedBox(height: isTablet ? 20 : 16),
+        _buildCreditUtilizationOverview(context, healthCardController),
+        SizedBox(height: isTablet ? 20 : 16),
+        _buildActionButtonsOverview(context),
+      ],
+    );
+  }
+
+  Widget _buildBalanceSectionOverview(BuildContext context, HeathCardOverviewController controller) {
+    final isTablet = MediaQuery.of(context).size.width > 600;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Wrap(
+        spacing: isTablet ? 16 : 10,
+        runSpacing: isTablet ? 16 : 10,
+        children: [
+          _buildBalanceCardOverview(
+            'Available Balance',
+            '₹${controller.availableBalance.value.toStringAsFixed(0)}',
+            context,
+          ),
+          _buildBalanceCardOverview(
+            'Used Credit',
+            '₹${controller.usedCredit.value.toStringAsFixed(0)}',
+            context,
+          ),
+          _buildBalanceCardOverview(
+            'Total Credit Limit',
+            '₹${controller.totalCreditLimit.value.toStringAsFixed(0)}',
+            context,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBalanceCardOverview(String title, String amount, BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width > 600;
+    return Container(
+      width: isTablet ? Get.width * 0.25 : Get.width * 0.28,
+      height: isTablet ? Get.height * 0.15 : Get.height * 0.11,
+      padding: EdgeInsets.all(isTablet ? 16 : 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+              fontSize: isTablet ? 14 : 12,
+            ),
+          ),
+          Spacer(),
+          Text(
+            amount,
+            style: TextStyle(
+              fontSize: isTablet ? 20 : 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCreditUtilizationOverview(BuildContext context, HeathCardOverviewController controller) {
+    final isTablet = MediaQuery.of(context).size.width > 600;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Credit Utilization',
+                style: TextStyle(
+                  fontSize: isTablet ? 20 : 16,
+                  fontWeight: FontWeight.bold,
+                   color: Colors.black,
+                ),
+              ),
+              Obx(() => Text(
+                    '${controller.creditUtilization.toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      fontSize: isTablet ? 20 : 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  )),
+            ],
+          ),
+          SizedBox(height: isTablet ? 16 : 10),
+          Obx(() => LinearPercentIndicator(
+                lineHeight: isTablet ? 12.0 : 8.0,
+                percent: controller.creditUtilization / 100,
+                backgroundColor: Colors.grey[300],
+                progressColor: Colors.deepPurple,
+                barRadius: Radius.circular(isTablet ? 6 : 4),
+                animation: true,
+                animationDuration: 1000,
+              )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtonsOverview(BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width > 600;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Wrap(
+        spacing: isTablet ? 24 : 24,
+        runSpacing: isTablet ? 24 : 16,
+        alignment: WrapAlignment.center,
+        children: [
+          _buildActionButtonOverview(Icons.add, 'Add Money', context, () {
+            // TODO: Implement Add Money action
+          }),
+          _buildActionButtonOverview(Icons.chat_bubble_outline, 'Chatbot', context, () {
+            // TODO: Implement Chatbot action
+             Get.toNamed('/chatbot');
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtonOverview(IconData icon, String label, BuildContext context, VoidCallback onTap) {
+    final isTablet = MediaQuery.of(context).size.width > 600;
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: EdgeInsets.all(isTablet ? 16 : 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Icon(
+              icon,
+              color: Colors.deepPurple,
+              size: isTablet ? 28 : 22,
+            ),
+          ),
+          SizedBox(height: isTablet ? 12 : 8),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: isTablet ? 11 : 9,
+              color: Colors.black,
+              fontWeight: FontWeight.bold
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOverviewCardGrid(BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width > 600;
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(14),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 1.4,
-            crossAxisSpacing: 18,
-            mainAxisSpacing: 18
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: isTablet ? 3 : 2,
+          childAspectRatio: isTablet ? 1.5 : 1.3,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
         ),
-        itemCount: cards.length,
+        itemCount: controller.cards.length,
         itemBuilder: (context, index) {
-          return Obx(() => Transform.translate(
-            offset: Offset(0, controller.cardAnimations[index]['offset']!.value),
-            child: Transform.scale(
-              scale: controller.cardAnimations[index]['scale']!.value,
-              child: GestureDetector(
-                onTapDown: (_) => controller.onCardPressed(index),
-                onTapUp: (_) => controller.onCardReleased(index),
-                onTapCancel: () => controller.onCardReleased(index),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOutQuad,
-                  transform: Matrix4.identity()
-                    ..setEntry(3, 2, 0.001) // perspective
-                    ..rotateX(0.1 * (1 - controller.cardAnimations[index]['scale']!.value))
-                    ..rotateY(0.1 * (1 - controller.cardAnimations[index]['scale']!.value)),
+          return Obx(() => Transform(
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.001)
+              ..rotateX(0.2 * controller.cardOffsets[index].value / 50)
+              ..rotateY(0.2 * controller.cardOffsets[index].value / 50)
+              ..scale(controller.cardScales[index].value),
+            alignment: FractionalOffset.center,
+            child: Transform.translate(
+              offset: Offset(0, controller.cardOffsets[index].value),
+              child: Hero(
+                tag: 'card_${controller.cards[index]['route']}',
+                child: Material(
+                  color: Colors.transparent,
                   child: _buildOverviewCard(
-                    cards[index]['title'] as String,
-                    cards[index]['price'] as String,
-                    cards[index]['icon'] as IconData,
-                    cards[index]['overview'] as String,
-                    cards[index]['color'] as Color,
-                    cards[index]['reminder'] as String,
+                    title: controller.cards[index]['title'] as String,
+                    amount: controller.cards[index]['amount'] as String,
+                    icon: controller.cards[index]['icon'] as IconData,
+                    subtitle: controller.cards[index]['subtitle'] as String,
+                    color: controller.cards[index]['color'] as Color,
+                    info: controller.cards[index]['info'] as String,
+                    index: index,
                   ),
                 ),
               ),
             ),
           ));
-        }
+        },
+      ),
     );
   }
 
-  Widget _buildOverviewCard(String title, String price, IconData icon, String overview, Color overviewColor, String reminder) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+  Widget _buildOverviewCard({
+    required String title,
+    required String amount,
+    required IconData icon,
+    required String subtitle,
+    required Color color,
+    required String info,
+    required int index,
+  }) {
+    return GestureDetector(
+      onTapDown: (_) => controller.onCardTapDown(index),
+      onTapUp: (_) => controller.onCardTapUp(index),
+      onTapCancel: () => controller.onCardTapCancel(index),
+      onTap: () => Get.toNamed(controller.cards[index]['route'] as String),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
           color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              spreadRadius: 1,
-              blurRadius: 4,
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
               offset: const Offset(0, 2),
-            )
-          ]
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[700],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Icon(icon, color: color, size: 16),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Text(
+              amount,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[800],
               ),
-              const Spacer(),
-              Icon(
-                icon,
-                color: Colors.grey,
-                size: 20,
-              )
-            ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 11,
+                color: color,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Flexible(
+              child: Text(
+                info,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width > 600;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: isTablet ? 32 : 16),
+      child: Column(
+        children: [
+          _buildActionCard(
+            title: 'Recent Transactions',
+            subtitle: 'Your recent health card usage',
+            icon: Icons.receipt_long_outlined,
+            onTap: () => Get.toNamed('/transactions'),
           ),
-          Text(
-            price,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+          const SizedBox(height: 16),
+          _buildActionCard(
+            title: 'Upcoming Appointments',
+            subtitle: 'Your scheduled medical appointments',
+            icon: Icons.calendar_month_outlined,
+            onTap: () => Get.toNamed('/appointments'),
           ),
-          Text(
-            overview,
-            style: TextStyle(fontSize: 11, color: overviewColor),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          Text(
-            reminder,
-            style: const TextStyle(
-                fontWeight: FontWeight.w400, fontSize: 11, color: Colors.grey),
-          ),
+          const SizedBox(height: 16),
         ],
       ),
     );
   }
 
-  Widget _buildOtherCards(){
-    return Column(
-      children: [
-        _buildContainer(
-          margin: EdgeInsets.all(14),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
+  Widget _buildActionCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.deepPurple[100],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: Colors.deepPurple, size: 24),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Recent Transactions",
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const Text(
-                    "Your recent health card transactions",
+                    title,
                     style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 12,
-                        color: Colors.grey),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
                   ),
                 ],
               ),
-              Icon(Icons.arrow_forward_ios_rounded,)
-            ],
-          ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          ],
         ),
-
-        _buildContainer(
-          margin: EdgeInsets.all(14),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Upcoming Appointments",
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    const Text(
-                      "Your scheduled medical appointments",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          color: Colors.grey),
-                    ),
-                  ],
-                ),
-                Icon(Icons.arrow_forward_ios_rounded,)
-              ],
-            )
-        ),
-      ],
-    );
-  }
-
-  Widget _buildContainer({required Widget child, EdgeInsetsGeometry? margin}){
-    return Container(
-      margin: margin,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              spreadRadius: 1,
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            )
-          ]
       ),
-      child: child,
     );
   }
 }
