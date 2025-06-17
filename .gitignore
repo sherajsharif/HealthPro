@@ -49,3 +49,40 @@ app.*.map.json
 # Environment variables
 .env
 .env.*
+
+# Backend related
+backend/node_modules/
+backend/.env
+backend/.env.local
+backend/.env.production
+backend/logs/
+backend/uploads/
+
+# IDE and editor files
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+Thumbs.db
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Server files (if not needed in repo)
+server.js
