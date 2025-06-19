@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
+import 'package:ri_medicare/chatbot_widget.dart';
 import 'package:ri_medicare/dashboard/dashboard_controller.dart';
 import 'package:ri_medicare/health_card/health_card_tab/health_card_tab_view.dart';
 import 'package:ri_medicare/health_care/health_care_tab/healthcare_tab_view.dart';
@@ -24,6 +25,13 @@ class DashboardView extends GetView<DashboardController>{
         ),)
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.to(() => const ChatbotWidget());
+        },
+        backgroundColor: Get.theme.primaryColor,
+        child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+      ),
     );
   }
 

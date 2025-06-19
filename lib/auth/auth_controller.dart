@@ -3,12 +3,14 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../services/api_service.dart';
 
 class AuthController extends GetxController{
   final isLoading = false.obs;
   final _isLoggedIn = false.obs;
   final obscurePassword = true.obs;
-  final String baseUrl = 'http://192.168.125.65:5000';  // Local server address
+  final String baseUrl = 'http://192.168.29.62:5000';  // Local server address
+  final ApiService _apiService = Get.find<ApiService>();
 
   // Form controllers
   final emailController = TextEditingController();
@@ -43,6 +45,12 @@ class AuthController extends GetxController{
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       _isLoggedIn.value = token != null;
+      
+      // Set token in ApiService if it exists
+      if (token != null) {
+        _apiService.setAuthToken(token);
+      }
+      
       print('Login status: ${_isLoggedIn.value}');
     } catch (e) {
       print('Error checking login status: $e');
@@ -144,6 +152,9 @@ class AuthController extends GetxController{
           await prefs.setString('token', token);
           await prefs.setBool('isLoggedIn', true);
           
+          // Set token in ApiService
+          _apiService.setAuthToken(token);
+          
           _isLoggedIn.value = true;
           Get.offAllNamed('/dashboard');
           
@@ -236,6 +247,9 @@ class AuthController extends GetxController{
       // Clear stored data
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
+
+      // Clear token from ApiService
+      _apiService.clearAuthToken();
 
       _isLoggedIn.value = false;
       Get.offAllNamed('/login');

@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 import 'package:ri_medicare/models/emi_payments.dart';
+import 'package:ri_medicare/models/loan_model.dart';
+import 'package:ri_medicare/services/api_service.dart';
 
 class MyLoansController extends GetxController{
   final cardNumber = 'HC-78901-23456'.obs;
@@ -9,6 +11,9 @@ class MyLoansController extends GetxController{
   final usedCredit = 15000.0.obs;
   final totalCreditLimit = 40000.0.obs;
   final paymentHistory = <EMIPayment>[].obs;
+  final loans = <Loan>[].obs;
+  final isLoading = false.obs;
+  final error = RxnString();
 
   double get creditUtilization => (usedCredit.value / totalCreditLimit.value) * 100;
 
@@ -16,6 +21,7 @@ class MyLoansController extends GetxController{
   void onInit() {
     super.onInit();
     loadPaymentHistory();
+    fetchLoans();
   }
 
 
@@ -59,5 +65,19 @@ class MyLoansController extends GetxController{
         paymentDate: '-',
       ),
     ];
+  }
+
+  Future<void> fetchLoans() async {
+    try {
+      isLoading.value = true;
+      error.value = null;
+      final apiService = Get.find<ApiService>();
+      final response = await apiService.get('/loans');
+      loans.assignAll((response as List).map((e) => Loan.fromJson(e)).toList());
+    } catch (e) {
+      error.value = e.toString();
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

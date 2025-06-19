@@ -1,22 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../models/health_card.dart';
+import '../services/health_card_service.dart';
 
 class OverViewController extends GetxController with GetTickerProviderStateMixin {
   late List<AnimationController> cardControllers;
   final cardScales = <RxDouble>[];
   final cardOffsets = <RxDouble>[];
   final isAnimating = false.obs;
+  final isLoading = true.obs;
+  final healthCard = Rxn<HealthCard>();
+  final error = RxnString();
+  final totalCreditLimit = 40000.0.obs;
+  final expandedTileIndex = RxInt(-1);
+
+  final healthCardService = HealthCardService();
+
+  bool get isActive {
+    if (healthCard.value == null) return false;
+    final now = DateTime.now();
+    return healthCard.value!.expiryDate.isAfter(now);
+  }
 
   final cards = [
-    {
-      'title': 'Health Card',
-      'amount': '₹25,000',
-      'icon': Icons.credit_card_outlined,
-      'subtitle': 'Available Credit',
-      'color': Colors.green,
-      'info': 'Card: HC-78901-23456',
-      'route': '/home'
-    },
+    // {
+    //   'title': 'Health Card',
+    //   'amount': '₹0',
+    //   'icon': Icons.credit_card_outlined,
+    //   'subtitle': 'Available Credit',
+    //   'color': Colors.green,
+    //   'info': 'Loading...',
+    //   'route': '/home'
+    // },
     {
       'title': 'Active Loan',
       'amount': '₹35,000',
@@ -35,27 +50,62 @@ class OverViewController extends GetxController with GetTickerProviderStateMixin
       'info': 'Last Visit: Nov 20, 2023',
       'route': '/transactions'
     },
-    {
-      'title': 'Appointments',
-      'amount': '2',
-      'icon': Icons.calendar_today_outlined,
-      'subtitle': 'Upcoming Appointments',
-      'color': Colors.orange,
-      'info': 'Next: Dec 10, 2023',
-      'route': '/appointments'
-    },
+    // {
+    //   'title': 'Appointments',
+    //   'amount': '2',
+    //   'icon': Icons.calendar_today_outlined,
+    //   'subtitle': 'Upcoming Appointments',
+    //   'color': Colors.orange,
+    //   'info': 'Next: Dec 10, 2023',
+    //   'route': '/appointments'
+    // },
   ];
 
   @override
   void onInit() {
     super.onInit();
     _initializeAnimations();
+    fetchHealthCard();
   }
 
   @override
   void onReady() {
     super.onReady();
     _playEntryAnimation();
+  }
+
+  Future<void> fetchHealthCard() async {
+    try {
+      isLoading.value = true;
+      error.value = null;
+      
+      final healthCards = await healthCardService.getUserHealthCards();
+      if (healthCards.isNotEmpty) {
+        healthCard.value = healthCards.first;
+        _updateHealthCardInfo();
+      }
+    } catch (e) {
+      error.value = e.toString();
+      _updateHealthCardInfo();
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  double get creditUtilization {
+    if (healthCard.value == null || healthCard.value!.requestedCreditLimit == 0) return 0;
+    return (healthCard.value!.usedCredit / healthCard.value!.requestedCreditLimit) * 100;
+  }
+
+  void _updateHealthCardInfo() {
+    if (healthCard.value != null) {
+      cards[0]['amount'] = '₹${healthCard.value!.availableCredit.toStringAsFixed(2)}';
+      cards[0]['info'] = 'Card: ${healthCard.value!.cardNumber}';
+    } else {
+      cards[0]['amount'] = '₹0.00';
+      cards[0]['info'] = error.value ?? 'No health card found';
+    }
+    update();
   }
 
   void _initializeAnimations() {

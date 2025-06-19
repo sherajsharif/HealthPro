@@ -140,6 +140,16 @@ class TransactionView extends GetView<TransactionController>{
   }
 
   Widget _buildTransactionsList() {
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      if (controller.error.value != null) {
+        return Center(child: Text('Error: ${controller.error.value}'));
+      }
+      if (controller.transactions.isEmpty) {
+        return Center(child: Text('No transactions found.'));
+      }
     return Column(
       children: [
         ...controller.transactions.asMap().entries.map((entry) {
@@ -147,7 +157,6 @@ class TransactionView extends GetView<TransactionController>{
           final transaction = entry.value;
           return _buildTransactionCard(transaction, index);
         }).toList(),
-        // const SizedBox(height: 12),
         Center(
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 12),
@@ -169,6 +178,7 @@ class TransactionView extends GetView<TransactionController>{
         ),
       ],
     );
+    });
   }
 
   Widget _buildTransactionCard(Transaction transaction, int index) {
@@ -197,7 +207,7 @@ class TransactionView extends GetView<TransactionController>{
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    transaction.date,
+                    '${transaction.date.day.toString().padLeft(2, '0')}/${transaction.date.month.toString().padLeft(2, '0')}/${transaction.date.year}',
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 12,
@@ -223,7 +233,7 @@ class TransactionView extends GetView<TransactionController>{
               ),
               SizedBox(height: 8),
               Text(
-                transaction.hospital,
+                transaction.hospital ?? '',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -231,7 +241,7 @@ class TransactionView extends GetView<TransactionController>{
               ),
               SizedBox(height: 4),
               Text(
-                transaction.service,
+                transaction.description,
                 style: TextStyle(
                   color: Colors.grey[600],
                   fontSize: 12,

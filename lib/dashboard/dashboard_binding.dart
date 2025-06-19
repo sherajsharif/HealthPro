@@ -27,7 +27,7 @@ class DashboardBinding extends Bindings{
     Get.lazyPut(() => HospitalVisitController());
     Get.lazyPut(() => HealthCareTabController());
     Get.lazyPut(() => HeathCardOverviewController());
-    Get.put(TransactionController());
+    Get.lazyPut(() => TransactionController());
     Get.lazyPut(() => PaymentController());
     Get.lazyPut(() => UpcomingAppointmentController());
     Get.lazyPut(() => ProfileController());

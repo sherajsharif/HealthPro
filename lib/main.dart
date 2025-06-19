@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:ri_medicare/auth/auth_controller.dart';
 import 'package:ri_medicare/routes/app_pages.dart';
 import 'package:ri_medicare/theme.dart';
+import 'package:ri_medicare/services/api_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +24,12 @@ void main() async {
     print('Error loading .env file: $e');
   }
 
-  // Initialize AuthController regardless of .env loading success, as it might not directly depend on dotenv
+  // Initialize ApiService
+  final apiService = ApiService();
+  await apiService.initialize();
+  Get.put(apiService);
+
+  // Initialize AuthController
   Get.put(AuthController());
 
   // Only run the app if the API key is available, or handle the case where it's not.
