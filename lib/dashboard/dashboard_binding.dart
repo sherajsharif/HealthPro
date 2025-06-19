@@ -12,7 +12,6 @@ import 'package:ri_medicare/home/home_controller.dart';
 import 'package:ri_medicare/kyc_page/kyc_page_controller.dart';
 import 'package:ri_medicare/my_loans/my_loans_controller.dart';
 import 'package:ri_medicare/overview/overview_controller.dart';
-import 'package:ri_medicare/profile/profile_binding.dart';
 import 'package:ri_medicare/profile/profile_controller.dart';
 
 class DashboardBinding extends Bindings{
@@ -27,7 +26,7 @@ class DashboardBinding extends Bindings{
     Get.lazyPut(() => HospitalVisitController());
     Get.lazyPut(() => HealthCareTabController());
     Get.lazyPut(() => HeathCardOverviewController());
-    Get.lazyPut(() => TransactionController());
+    Get.put(TransactionController());
     Get.lazyPut(() => PaymentController());
     Get.lazyPut(() => UpcomingAppointmentController());
     Get.lazyPut(() => ProfileController());

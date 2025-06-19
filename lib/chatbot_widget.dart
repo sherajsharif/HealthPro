@@ -72,7 +72,7 @@ class _ChatbotWidgetState extends State<ChatbotWidget> {
   final List<Map<String, String>> _messages = [];
   final TextEditingController _textController = TextEditingController();
   late final String _geminiApiKey;
-  final String _baseUrl = 'http://192.168.29.62:5000';
+  final String _baseUrl = 'http://192.168.125.65:5000';
   bool _isLoading = false;
   bool _isTyping = false;
   late SharedPreferences _prefs;
