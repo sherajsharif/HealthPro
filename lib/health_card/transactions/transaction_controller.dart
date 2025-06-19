@@ -1,38 +1,33 @@
 import 'package:get/get.dart';
 import 'package:ri_medicare/models/transaction_model.dart';
+import 'package:ri_medicare/services/transaction_service.dart';
 
 class TransactionController extends GetxController{
   final selectedTransactionTab = 0.obs;
-  final transactions = <Transaction>[
-    Transaction(
-      date: '22/11/2023',
-      hospital: 'City General Hospital',
-      service: 'Consultation',
-      amount: 2500,
-      status: 'Completed',
-    ),
-    Transaction(
-      date: '15/11/2023',
-      hospital: 'Medicare Pharmacy',
-      service: 'Medication',
-      amount: 1800,
-      status: 'Completed',
-    ),
-    Transaction(
-      date: '10/11/2023',
-      hospital: 'City General Hospital',
-      service: 'Lab Tests',
-      amount: 3500,
-      status: 'Completed',
-    ),
-    Transaction(
-      date: '05/11/2023',
-      hospital: 'Wellness Clinic',
-      service: 'Physiotherapy',
-      amount: 1200,
-      status: 'Completed',
-    ),
-  ].obs;
+  final transactions = <Transaction>[].obs;
+  final isLoading = false.obs;
+  final error = RxnString();
+
+  final TransactionService _transactionService = TransactionService();
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchTransactions();
+  }
+
+  Future<void> fetchTransactions() async {
+    try {
+      isLoading.value = true;
+      error.value = null;
+      final txs = await _transactionService.getUserTransactions();
+      transactions.assignAll(txs);
+    } catch (e) {
+      error.value = e.toString();
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
 
   void changeTransactionTab(int index) {

@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:ri_medicare/auth/auth_controller.dart';
 import 'package:ri_medicare/routes/app_pages.dart';
+import 'package:ri_medicare/services/api_service.dart';
 import 'package:ri_medicare/theme.dart';
 
 void main() async {
@@ -22,6 +23,12 @@ void main() async {
   } catch (e) {
     print('Error loading .env file: $e');
   }
+
+  // Initialize ApiService
+  final apiService = ApiService();
+  await apiService.initialize();
+  Get.put(apiService);
+
 
   // Initialize AuthController regardless of .env loading success, as it might not directly depend on dotenv
   Get.put(AuthController());

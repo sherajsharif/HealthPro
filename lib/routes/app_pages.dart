@@ -15,7 +15,6 @@ import 'package:ri_medicare/health_card/payment/payment_binding.dart';
 import 'package:ri_medicare/health_card/payment/payment_view.dart';
 import 'package:ri_medicare/health_card/transactions/transaction_binding.dart';
 import 'package:ri_medicare/health_card/transactions/transaction_view.dart';
-import 'package:ri_medicare/health_care/health_care_tab/healthcare_tab_binding.dart';
 import 'package:ri_medicare/health_care/health_care_tab/healthcare_tab_view.dart';
 import 'package:ri_medicare/health_care/hospital_visits/hospital_visits_binding.dart';
 import 'package:ri_medicare/health_care/hospital_visits/hospital_visits_view.dart';
@@ -23,15 +22,12 @@ import 'package:ri_medicare/health_care/upcoming_appointments/upcoming_appointme
 import 'package:ri_medicare/health_care/upcoming_appointments/upcoming_appointments_view.dart';
 import 'package:ri_medicare/home/home_binding.dart';
 import 'package:ri_medicare/home/home_view.dart';
-import 'package:ri_medicare/kyc_page/kyc_page_binding.dart';
 import 'package:ri_medicare/kyc_page/kyc_page_view.dart';
 import 'package:ri_medicare/my_loans/my_loans_binding.dart';
 import 'package:ri_medicare/my_loans/my_loans_view.dart';
-import 'package:ri_medicare/overview/overview_binding.dart';
 import 'package:ri_medicare/overview/overview_view.dart';
-import 'package:ri_medicare/profile/profile_binding.dart';
 import 'package:ri_medicare/profile/profile_view.dart';
-import 'package:ri_medicare/registration_screen.dart';
+import 'package:ri_medicare/auth/registration_screen.dart';
 import 'app_routes.dart';
 
 class AppPages {
